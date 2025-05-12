@@ -34,45 +34,44 @@ This is a simple PHP-based web application for managing conference registrations
    Run the following SQL commands:
 
    ```sql
-   CREATE DATABASE conference_registration;
-   USE conference_registration;
+    CREATE TABLE users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        first_name VARCHAR(100) NOT NULL,
+        last_name VARCHAR(100) NOT NULL,
+        phone VARCHAR(20),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
 
-   CREATE TABLE users (
-       id INT AUTO_INCREMENT PRIMARY KEY,
-       email VARCHAR(255) NOT NULL UNIQUE,
-       password VARCHAR(255) NOT NULL,
-       first_name VARCHAR(100) NOT NULL,
-       last_name VARCHAR(100) NOT NULL,
-       phone VARCHAR(20),
-       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+    CREATE TABLE registrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        num_attendees INT NOT NULL,
+        street VARCHAR(255) NOT NULL,
+        barangay VARCHAR(100) NOT NULL,
+        city VARCHAR(100) NOT NULL,
+        district VARCHAR(100) NOT NULL,
+        province VARCHAR(100) NOT NULL,
+        region VARCHAR(100) NOT NULL,
+        zip_code VARCHAR(10) NOT NULL,
+        document_path VARCHAR(255) NOT NULL,
+        registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
 
-   CREATE TABLE registrations (
-       id INT AUTO_INCREMENT PRIMARY KEY,
-       user_id INT NOT NULL,
-       num_attendees INT NOT NULL,
-       street VARCHAR(255) NOT NULL,
-       barangay VARCHAR(100) NOT NULL,
-       city VARCHAR(100) NOT NULL,
-       district VARCHAR(100) NOT NULL,
-       province VARCHAR(100) NOT NULL,
-       region VARCHAR(100) NOT NULL,
-       zip_code VARCHAR(10) NOT NULL,
-       registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-       FOREIGN KEY (user_id) REFERENCES users(id)
-   );
+    CREATE TABLE regions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL
+    );
 
-   CREATE TABLE regions (
-       id INT AUTO_INCREMENT PRIMARY KEY,
-       name VARCHAR(100) NOT NULL
-   );
+    INSERT INTO regions (name) VALUES 
+    ('National Capital Region (NCR)'),
+    ('Cordillera Administrative Region (CAR)'),
+    ('Ilocos Region (Region I)'),
+    ('Cagayan Valley (Region II)'),
+    ('Central Luzon (Region III)');
 
-   INSERT INTO regions (name) VALUES 
-   ('National Capital Region (NCR)'),
-   ('Cordillera Administrative Region (CAR)'),
-   ('Ilocos Region (Region I)'),
-   ('Cagayan Valley (Region II)'),
-   ('Central Luzon (Region III)');
    ```
 
 3. **Configure the application**  
