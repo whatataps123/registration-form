@@ -55,28 +55,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Check if email already exists
             $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $stmt->execute([$email]);
-            
+
             if ($stmt->rowCount() > 0) {
                 $errors[] = 'Email already registered.';
             } else {
-                // Hash password
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                
-                // Insert user
-                $stmt = $pdo->prepare("INSERT INTO users (email, password, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$email, $hashedPassword, $firstName, $lastName, $phone]);
-                $userId = $pdo->lastInsertId();
-                
-                // Insert registration
-                $stmt = $pdo->prepare("INSERT INTO registrations (user_id, num_attendees, street, barangay, city, district, province, region, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$userId, $numAttendees, $street, $barangay, $city, $district, $province, $region, $zipCode]);
-                
-                $success = true;
+                // Handle file upload
+                $filePath = null;
+                if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = __DIR__ . '/uploads/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0755, true); // create uploads directory if it doesn't exist
+                    }
+
+                    $fileTmpPath = $_FILES['document']['tmp_name'];
+                    $originalName = basename($_FILES['document']['name']);
+                    $safeName = uniqid() . '-' . preg_replace('/[^a-zA-Z0-9\._-]/', '_', $originalName);
+                    $targetFilePath = $uploadDir . $safeName;
+
+                    if (move_uploaded_file($fileTmpPath, $targetFilePath)) {
+                        $filePath = 'uploads/' . $safeName;
+                    } else {
+                        $errors[] = 'Failed to move uploaded file.';
+                    }
+                }
+
+                if (empty($errors)) {
+                    // Hash password
+                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+                    // Insert user
+                    $stmt = $pdo->prepare("INSERT INTO users (email, password, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$email, $hashedPassword, $firstName, $lastName, $phone]);
+                    $userId = $pdo->lastInsertId();
+
+                    // Insert registration
+                    $stmt = $pdo->prepare("INSERT INTO registrations (user_id, num_attendees, street, barangay, city, district, province, region, zip_code, document_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$userId, $numAttendees, $street, $barangay, $city, $district, $province, $region, $zipCode, $filePath]);
+
+                    $success = true;
+                }
             }
         } catch (PDOException $e) {
             $errors[] = 'Database error: ' . $e->getMessage();
         }
     }
+
 }
 ?>
 
@@ -162,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p>You can now <a href="login.php" class="alert-link">login</a> to access your account.</p>
                     </div>
                 <?php else: ?>
-                    <form action="register.php" method="post">
+                    <form action="register.php" method="post" enctype="multipart/form-data">
                         <!-- Personal Information Section -->
                         <div class="form-section">
                             <h3><i class="fas fa-user-circle me-2"></i> Personal Information</h3>
@@ -311,7 +334,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                         </div>
-                        
+                        <!-- Agreement Checkbox -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="agree" name="agree" value="1" required 
+                                <?php if (isset($_POST['agree'])) echo 'checked'; ?>>
+                            <label class="form-check-label" for="agree">
+                                I agree to the <a href="#" target="_blank">terms and conditions</a>
+                            </label>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="mb-4">
+                            <label for="document" class="form-label">Upload 1x1 Formal Picture (JPG, PNG) *</label>
+                            <input type="file" class="form-control" id="document" name="document" accept=".jpg,.jpeg,.png" required>
+                        </div>
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-register btn-lg">
                                 <i class="fas fa-user-plus me-2"></i> Register Now

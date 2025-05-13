@@ -70,6 +70,13 @@ $registration = $stmt->fetch();
         .btn-logout:hover {
             opacity: 0.9;
         }
+        .uploaded-doc {
+            margin: 0 auto 15px;
+            max-width: 150px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -98,6 +105,15 @@ $registration = $stmt->fetch();
                     <div class="col-md-6">
                         <div class="profile-card">
                             <h3 class="mb-4"><i class="fas fa-user me-2"></i> Personal Information</h3>
+
+                            <?php if ($registration && !empty($registration['document_path']) && file_exists($registration['document_path'])): ?>
+                                <img src="<?php echo htmlspecialchars($registration['document_path']); ?>" 
+                                     alt="Formal Picture" 
+                                     class="uploaded-doc">
+                            <?php else: ?>
+                                <div class="text-center text-muted mb-3">No formal picture uploaded.</div>
+                            <?php endif; ?>
+
                             <div class="mb-3">
                                 <div class="info-label">Name:</div>
                                 <div><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></div>
