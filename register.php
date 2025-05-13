@@ -283,21 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="district" class="form-label">District *</label>
-                                    <select class="form-select" id="district" name="district" required>
-                                        <option value="">Select District</option>
-                                        <?php if (!empty($_POST['region'])): ?>
-                                            <?php foreach ($regions[$_POST['region']]['districts'] as $district): ?>
-                                                <option value="<?php echo htmlspecialchars($district); ?>"
-                                                    <?php if (($_POST['district'] ?? '') === $district) echo 'selected'; ?>>
-                                                    <?php echo htmlspecialchars($district); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="city" class="form-label">City *</label>
+                                <label for="city" class="form-label">City *</label>
                                     <select class="form-select" id="city" name="city" required>
                                         <option value="">Select City</option>
                                         <?php if (!empty($_POST['region'])): ?>
@@ -305,6 +291,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <option value="<?php echo htmlspecialchars($city); ?>"
                                                     <?php if (($_POST['city'] ?? '') === $city) echo 'selected'; ?>>
                                                     <?php echo htmlspecialchars($city); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                <label for="district" class="form-label">District *</label>
+                                    <select class="form-select" id="district" name="district" required>
+                                        <option value="">Select District</option>
+                                        <?php if (!empty($_POST['region'])): ?>
+                                            <?php foreach ($regions[$_POST['region']]['districts'] as $district): ?>
+                                                <option value="<?php echo htmlspecialchars($district); ?>"
+                                                    <?php if (($_POST['district'] ?? '') === $district) echo 'selected'; ?>>
+                                                    <?php echo htmlspecialchars($district); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
