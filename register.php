@@ -171,84 +171,9 @@ if (isset($_POST['city']) && isset($selectedRegionData['cities'][$_POST['city']]
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style-files/register.css">
     <!-- SweetAlert2 for popup alerts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .registration-container {
-            max-width: 800px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .registration-header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .registration-body {
-            background-color: white;
-            padding: 30px;
-        }
-
-        .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .form-section h3 {
-            color: #6a11cb;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .btn-register {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            border: none;
-            padding: 10px 25px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-register:hover {
-            opacity: 0.9;
-        }
-
-        .is-invalid {
-            border-color: #dc3545;
-        }
-        
-        .invalid-feedback {
-            display: none;
-            width: 100%;
-            margin-top: 0.25rem;
-            font-size: 0.875em;
-            color: #dc3545;
-        }
-        
-        .was-validated .form-control:invalid, 
-        .was-validated .form-select:invalid,
-        .form-control.is-invalid,
-        .form-select.is-invalid {
-            border-color: #dc3545;
-        }
-        
-        .was-validated .form-control:invalid ~ .invalid-feedback, 
-        .was-validated .form-select:invalid ~ .invalid-feedback,
-        .form-control.is-invalid ~ .invalid-feedback,
-        .form-select.is-invalid ~ .invalid-feedback,
-        .was-validated .form-check-input:invalid ~ .invalid-feedback,
-        .form-check-input.is-invalid ~ .invalid-feedback {
-            display: block;
-        }
-    </style>
 </head>
 
 <body>

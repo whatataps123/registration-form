@@ -1,0 +1,29 @@
+body {
+    background-color: #f8f9fa;
+}
+.login-container {
+    max-width: 500px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.login-header {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+.login-body {
+    background-color: white;
+    padding: 30px;
+}
+.btn-login {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border: none;
+    padding: 10px 25px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.btn-login:hover {
+    opacity: 0.9;
+}

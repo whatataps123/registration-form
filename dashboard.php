@@ -29,55 +29,7 @@ $registration = $stmt->fetch();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .dashboard-container {
-            max-width: 1000px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .dashboard-header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 30px;
-        }
-        .dashboard-body {
-            background-color: white;
-            padding: 30px;
-        }
-        .profile-card {
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-            padding: 25px;
-            margin-bottom: 30px;
-            border-left: 5px solid #6a11cb;
-        }
-        .info-label {
-            font-weight: 600;
-            color: #6a11cb;
-        }
-        .btn-logout {
-            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-            border: none;
-            padding: 10px 25px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .btn-logout:hover {
-            opacity: 0.9;
-        }
-        .uploaded-doc {
-            margin: 0 auto 15px;
-            max-width: 150px;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="style-files/dashboard.css">
 </head>
 <body>
     <div class="container py-5">

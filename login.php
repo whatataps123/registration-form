@@ -40,37 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Conference Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .login-container {
-            max-width: 500px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .login-header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .login-body {
-            background-color: white;
-            padding: 30px;
-        }
-        .btn-login {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            border: none;
-            padding: 10px 25px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .btn-login:hover {
-            opacity: 0.9;
-        }
-    </style>
+    <link rel="stylesheet" href="style-files/login.css">
 </head>
 <body>
     <div class="container py-5">
