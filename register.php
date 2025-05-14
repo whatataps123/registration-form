@@ -55,51 +55,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Check if email already exists
             $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
             $stmt->execute([$email]);
-
+            
             if ($stmt->rowCount() > 0) {
                 $errors[] = 'Email already registered.';
             } else {
-                // Handle file upload
-                $filePath = null;
-                if (isset($_FILES['document']) && $_FILES['document']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = __DIR__ . '/uploads/';
-                    if (!is_dir($uploadDir)) {
-                        mkdir($uploadDir, 0755, true); // create uploads directory if it doesn't exist
-                    }
-
-                    $fileTmpPath = $_FILES['document']['tmp_name'];
-                    $originalName = basename($_FILES['document']['name']);
-                    $safeName = uniqid() . '-' . preg_replace('/[^a-zA-Z0-9\._-]/', '_', $originalName);
-                    $targetFilePath = $uploadDir . $safeName;
-
-                    if (move_uploaded_file($fileTmpPath, $targetFilePath)) {
-                        $filePath = 'uploads/' . $safeName;
-                    } else {
-                        $errors[] = 'Failed to move uploaded file.';
-                    }
-                }
-
-                if (empty($errors)) {
-                    // Hash password
-                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-                    // Insert user
-                    $stmt = $pdo->prepare("INSERT INTO users (email, password, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([$email, $hashedPassword, $firstName, $lastName, $phone]);
-                    $userId = $pdo->lastInsertId();
-
-                    // Insert registration
-                    $stmt = $pdo->prepare("INSERT INTO registrations (user_id, num_attendees, street, barangay, city, district, province, region, zip_code, document_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$userId, $numAttendees, $street, $barangay, $city, $district, $province, $region, $zipCode, $filePath]);
-
-                    $success = true;
-                }
+                // Hash password
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                
+                // Insert user
+                $stmt = $pdo->prepare("INSERT INTO users (email, password, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$email, $hashedPassword, $firstName, $lastName, $phone]);
+                $userId = $pdo->lastInsertId();
+                
+                // Insert registration
+                $stmt = $pdo->prepare("INSERT INTO registrations (user_id, num_attendees, street, barangay, city, district, province, region, zip_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$userId, $numAttendees, $street, $barangay, $city, $district, $province, $region, $zipCode]);
+                
+                $success = true;
             }
         } catch (PDOException $e) {
             $errors[] = 'Database error: ' . $e->getMessage();
         }
     }
+}
 
+// Get selected region data if form was submitted
+$selectedRegionData = [];
+if (isset($_POST['region'])) {
+    $selectedRegion = $_POST['region'];
+    if (isset($regions[$selectedRegion])) {
+        $selectedRegionData = $regions[$selectedRegion];
+    }
+}
+
+// Get selected city data if form was submitted
+$selectedCityData = [];
+if (isset($_POST['city']) && isset($selectedRegionData['cities'][$_POST['city']])) {
+    $selectedCityData = $selectedRegionData['cities'][$_POST['city']];
 }
 ?>
 
@@ -109,10 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conference Registration</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Custom CSS -->
     <style>
         body {
             background-color: #f8f9fa;
@@ -185,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p>You can now <a href="login.php" class="alert-link">login</a> to access your account.</p>
                     </div>
                 <?php else: ?>
-                    <form action="register.php" method="post" enctype="multipart/form-data">
+                    <form action="register.php" method="post">
                         <!-- Personal Information Section -->
                         <div class="form-section">
                             <h3><i class="fas fa-user-circle me-2"></i> Personal Information</h3>
@@ -269,8 +261,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <label for="province" class="form-label">Province *</label>
                                     <select class="form-select" id="province" name="province" required>
                                         <option value="">Select Province</option>
-                                        <?php if (!empty($_POST['region'])): ?>
-                                            <?php foreach ($regions[$_POST['region']]['provinces'] as $province): ?>
+                                        <?php if (!empty($selectedRegionData['provinces'])): ?>
+                                            <?php foreach ($selectedRegionData['provinces'] as $province): ?>
                                                 <option value="<?php echo htmlspecialchars($province); ?>"
                                                     <?php if (($_POST['province'] ?? '') === $province) echo 'selected'; ?>>
                                                     <?php echo htmlspecialchars($province); ?>
@@ -283,28 +275,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">City *</label>
-                                    <select class="form-select" id="city" name="city" required>
-                                        <option value="">Select City</option>
-                                        <?php if (!empty($_POST['region'])): ?>
-                                            <?php foreach ($regions[$_POST['region']]['cities'] as $city): ?>
-                                                <option value="<?php echo htmlspecialchars($city); ?>"
-                                                    <?php if (($_POST['city'] ?? '') === $city) echo 'selected'; ?>>
-                                                    <?php echo htmlspecialchars($city); ?>
+                                    <label for="district" class="form-label">District *</label>
+                                    <select class="form-select" id="district" name="district" required>
+                                        <option value="">Select District</option>
+                                        <?php if (!empty($selectedRegionData['districts'])): ?>
+                                            <?php foreach ($selectedRegionData['districts'] as $district): ?>
+                                                <option value="<?php echo htmlspecialchars($district); ?>"
+                                                    <?php if (($_POST['district'] ?? '') === $district) echo 'selected'; ?>>
+                                                    <?php echo htmlspecialchars($district); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                <label for="district" class="form-label">District *</label>
-                                    <select class="form-select" id="district" name="district" required>
-                                        <option value="">Select District</option>
-                                        <?php if (!empty($_POST['region'])): ?>
-                                            <?php foreach ($regions[$_POST['region']]['districts'] as $district): ?>
-                                                <option value="<?php echo htmlspecialchars($district); ?>"
-                                                    <?php if (($_POST['district'] ?? '') === $district) echo 'selected'; ?>>
-                                                    <?php echo htmlspecialchars($district); ?>
+                                    <label for="city" class="form-label">City *</label>
+                                    <select class="form-select" id="city" name="city" required>
+                                        <option value="">Select City</option>
+                                        <?php if (!empty($selectedRegionData['cities'])): ?>
+                                            <?php foreach ($selectedRegionData['cities'] as $cityName => $cityData): ?>
+                                                <option value="<?php echo htmlspecialchars($cityName); ?>"
+                                                    <?php if (($_POST['city'] ?? '') === $cityName) echo 'selected'; ?>>
+                                                    <?php echo htmlspecialchars($cityName); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
@@ -317,8 +309,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <label for="barangay" class="form-label">Barangay *</label>
                                     <select class="form-select" id="barangay" name="barangay" required>
                                         <option value="">Select Barangay</option>
-                                        <?php if (!empty($_POST['region'])): ?>
-                                            <?php foreach ($regions[$_POST['region']]['barangays'] as $barangay): ?>
+                                        <?php if (!empty($selectedCityData['barangays'])): ?>
+                                            <?php foreach ($selectedCityData['barangays'] as $barangay): ?>
+                                                <option value="<?php echo htmlspecialchars($barangay); ?>"
+                                                    <?php if (($_POST['barangay'] ?? '') === $barangay) echo 'selected'; ?>>
+                                                    <?php echo htmlspecialchars($barangay); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php elseif (!empty($selectedRegionData['barangays'])): ?>
+                                            <?php foreach ($selectedRegionData['barangays'] as $barangay): ?>
                                                 <option value="<?php echo htmlspecialchars($barangay); ?>"
                                                     <?php if (($_POST['barangay'] ?? '') === $barangay) echo 'selected'; ?>>
                                                     <?php echo htmlspecialchars($barangay); ?>
@@ -334,8 +333,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
                         </div>
-                        <!-- Agreement Checkbox -->
-                        <div class="form-check mb-4">
+                                                <!-- Agreement Checkbox -->
+                                                <div class="form-check mb-4">
                             <input class="form-check-input" type="checkbox" id="agree" name="agree" value="1" required 
                                 <?php if (isset($_POST['agree'])) echo 'checked'; ?>>
                             <label class="form-check-label" for="agree">
@@ -348,7 +347,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="document" class="form-label">Upload 1x1 Formal Picture (JPG, PNG) *</label>
                             <input type="file" class="form-control" id="document" name="document" accept=".jpg,.jpeg,.png" required>
                         </div>
-
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-register btn-lg">
                                 <i class="fas fa-user-plus me-2"></i> Register Now
@@ -383,40 +381,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
             
             if (region) {
+                // This would normally be an AJAX call to get the data
+                // For this demo, we'll simulate it with a hardcoded approach
                 const regionsData = <?php echo json_encode($regions); ?>;
                 const regionData = regionsData[region];
                 
                 // Populate provinces
-                regionData.provinces.forEach(province => {
-                    const option = document.createElement('option');
-                    option.value = province;
-                    option.textContent = province;
-                    provinceSelect.appendChild(option);
-                });
+                if (regionData.provinces) {
+                    regionData.provinces.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province;
+                        option.textContent = province;
+                        provinceSelect.appendChild(option);
+                    });
+                }
                 
                 // Populate districts
-                regionData.districts.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district;
-                    option.textContent = district;
-                    districtSelect.appendChild(option);
-                });
+                if (regionData.districts) {
+                    regionData.districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
+                    });
+                }
                 
                 // Populate cities
-                regionData.cities.forEach(city => {
-                    const option = document.createElement('option');
-                    option.value = city;
-                    option.textContent = city;
-                    citySelect.appendChild(option);
-                });
+                if (regionData.cities) {
+                    Object.keys(regionData.cities).forEach(cityName => {
+                        const option = document.createElement('option');
+                        option.value = cityName;
+                        option.textContent = cityName;
+                        citySelect.appendChild(option);
+                    });
+                }
                 
-                // Populate barangays
-                regionData.barangays.forEach(barangay => {
-                    const option = document.createElement('option');
-                    option.value = barangay;
-                    option.textContent = barangay;
-                    barangaySelect.appendChild(option);
-                });
+                // Populate barangays (from region if no city selected)
+                if (regionData.barangays) {
+                    regionData.barangays.forEach(barangay => {
+                        const option = document.createElement('option');
+                        option.value = barangay;
+                        option.textContent = barangay;
+                        barangaySelect.appendChild(option);
+                    });
+                }
+            }
+        });
+
+        // Dynamic barangay population based on city selection
+        document.getElementById('city').addEventListener('change', function() {
+            const city = this.value;
+            const region = document.getElementById('region').value;
+            const barangaySelect = document.getElementById('barangay');
+            
+            // Reset barangay select
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            
+            if (city && region) {
+                const regionsData = <?php echo json_encode($regions); ?>;
+                const regionData = regionsData[region];
+                
+                if (regionData.cities && regionData.cities[city] && regionData.cities[city].barangays) {
+                    // Populate barangays from selected city
+                    regionData.cities[city].barangays.forEach(barangay => {
+                        const option = document.createElement('option');
+                        option.value = barangay;
+                        option.textContent = barangay;
+                        barangaySelect.appendChild(option);
+                    });
+                } else if (regionData.barangays) {
+                    // Fallback to region barangays
+                    regionData.barangays.forEach(barangay => {
+                        const option = document.createElement('option');
+                        option.value = barangay;
+                        option.textContent = barangay;
+                        barangaySelect.appendChild(option);
+                    });
+                }
             }
         });
     </script>

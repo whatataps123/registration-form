@@ -16,11 +16,31 @@ try {
 $regions = [
     'National Capital Region (NCR)' => [
         'provinces' => ['Metro Manila'],
-        'districts' => ['NCR'],
+        'districts' => ['1st', '2nd', '3rd', '4th'],
         'cities' => [
-            'Manila', 'Quezon City', 'Caloocan', 'Las Piñas', 'Makati',
-            'Malabon', 'Mandaluyong', 'Marikina', 'Muntinlupa', 'Navotas',
-            'Parañaque', 'Pasay', 'Pasig', 'San Juan', 'Taguig', 'Valenzuela'
+            'Manila' => [
+                'barangays' => [
+                    'Binondo', 'Ermita', 'Intramuros', 'Malate', 'Paco',
+                    'Pandacan', 'Port Area', 'Quiapo', 'San Andres',
+                    'San Miguel', 'Sampaloc', 'Santa Ana', 'Santa Cruz',
+                    'Santo Domingo', 'Tondo'
+                ]
+            ],
+            'Quezon City' => [],
+            'Caloocan' => [],
+            'Las Piñas' => [],
+            'Makati' => [],
+            'Malabon' => [],
+            'Mandaluyong' => [],
+            'Marikina' => [],
+            'Muntinlupa' => [],
+            'Navotas' => [],
+            'Parañaque' => [],
+            'Pasay' => [],
+            'Pasig' => [],
+            'San Juan' => [],
+            'Taguig' => [],
+            'Valenzuela' => []
         ],
         'barangays' => ['Various'] // Simplified for demo
     ],
